@@ -1,6 +1,9 @@
+import Request.Request;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.logging.Logger;
 
 public class Main {
   public static void main(String[] args) {
@@ -12,16 +15,15 @@ public class Main {
         // ensures that we don't run into 'Address already in use' errors
         serverSocket.setReuseAddress(true);
 
-        Socket clientSocket = serverSocket.accept(); // Wait for connection from client.
-        Client client = new Client(clientSocket);
-        Request request = client.getRequest();
-        if (request.getMethod().equals("GET") && request.getUrl().equals("/")) {
-          client.sendMessage("HTTP/1.1 200 OK\r\n\r\n");
-        } else {
-          client.sendMessage("HTTP/1.1 404 Not Found\r\n\r\n");
+         // Wait for connection from client.
+        while (true) {
+          Socket clientSocket = serverSocket.accept();
+          Thread thread = new Thread(new Client(clientSocket));
+          thread.start();
+
         }
-        serverSocket.close();
-        client.closeSocket();
+
+
 
 
       } catch (IOException e) {
